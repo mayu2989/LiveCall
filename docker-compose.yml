@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: livecall
+      POSTGRES_USER: livecall
+      POSTGRES_PASSWORD: livecall
+    ports:
+      - "5433:5432"
+    volumes:
+      - livecall-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U livecall -d livecall"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    image: maven:3.9-eclipse-temurin-21
+    profiles: [app]
+    working_dir: /workspace
+    command: ["mvn", "-f", "backend/pom.xml", "spring-boot:run"]
+    env_file: .env
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/livecall
+      DB_USERNAME: livecall
+      DB_PASSWORD: livecall
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      COOKIE_SECURE: "false"
+    volumes:
+      - .:/workspace
+      - livecall-maven-cache:/root/.m2
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  livecall-postgres:
+  livecall-maven-cache:

@@ -1,0 +1,39 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${COOKIE_SECURE:false}
+
+spring:
+  application:
+    name: livecall-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/livecall}
+    username: ${DB_USERNAME:livecall}
+    password: ${DB_PASSWORD:livecall}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:configure-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:configure-google-client-secret}
+            scope: openid, profile, email
+            redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:5173/login/oauth2/code/google}
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+
+livekit:
+  url: ${LIVEKIT_URL:}
+  api-key: ${LIVEKIT_API_KEY:}
+  api-secret: ${LIVEKIT_API_SECRET:}
