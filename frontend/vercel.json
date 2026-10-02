@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://livecall-a64p.onrender.com/api/:path*" },
+    { "source": "/oauth2/:path*", "destination": "https://livecall-a64p.onrender.com/oauth2/:path*" },
+    { "source": "/login/oauth2/:path*", "destination": "https://livecall-a64p.onrender.com/login/oauth2/:path*" },
+    { "source": "/logout", "destination": "https://livecall-a64p.onrender.com/logout" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
