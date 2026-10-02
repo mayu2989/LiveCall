@@ -23,6 +23,16 @@ A web-first, one-to-one video calling app with a Java / Spring Boot backend.
 
 The web client runs at http://localhost:5173, the API at http://localhost:8081, and PostgreSQL is exposed on port 5433. Vite proxies API and Google OAuth requests to Spring Boot. Google sign-in requires an OAuth client with `http://localhost:5173/login/oauth2/code/google` as an authorized redirect URI (or set `GOOGLE_REDIRECT_URI` to another configured callback). LiveKit credentials are required for real calls.
 
+## Deploy the backend to Render
+
+1. In Render, create a Web Service from this repository's `main` branch. Choose the Docker runtime, use the repository root as the build context, and set the Dockerfile path to `./Dockerfile`.
+2. Set the health check path to `/api/health`. The service listens on Render's `PORT` environment variable.
+3. Add runtime environment variables in Render (never commit `.env`): `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `FRONTEND_URL`, `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and `COOKIE_SECURE=true`.
+4. For Neon, use its PostgreSQL connection details in `DB_URL` as a JDBC URL, for example `jdbc:postgresql://<host>/<database>?sslmode=require`; set the matching username and password separately. The app runs Flyway migrations at startup, so the database must be reachable on first deploy.
+5. Once the Vercel frontend exists, use its origin for `FRONTEND_URL`. If Vercel proxies `/login/oauth2/code/google` to Render, set `GOOGLE_REDIRECT_URI` to that Vercel callback URL and authorize the same exact URI in Google Cloud. Store Google and LiveKit secrets only in Render's environment settings.
+
+Vercel's `/api`, `/oauth2`, `/login`, and `/logout` rewrites should forward to this service so the browser can keep using same-origin URLs and session cookies.
+
 ## Configure Google sign-in
 
 1. In Google Cloud Console, create or select a project and configure the OAuth consent screen / Google Auth Platform branding and audience.
